@@ -2,7 +2,7 @@
   "name": "com.dmgtoolbox.savedata",
   "displayName": "Saving/Loading data package",
   "version": "1.0.0",
-  "unity": "2022.3.22f1",
+  "unity": "2022.3",
   "licensesUrl": "See LICENSE.md",
   "author": {
     "name": "Dan the Dev",
