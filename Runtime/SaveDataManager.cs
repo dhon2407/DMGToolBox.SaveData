@@ -5,12 +5,12 @@ namespace DMGToolBox.SaveData
 {
     public class SaveDataManager
     {
-        public static SaveLoadActionResult Save(string saveFileName, GameData gameData) =>
+        public static SaveLoadActionResult Save(string saveFileName, IGameData gameData) =>
             Instance.SaveGame(saveFileName, gameData);
-        public static GameData Load(string saveFileName) => 
+        public static IGameData Load(string saveFileName) => 
             Instance.LoadGame(saveFileName);
-        public static GameData LoadCurrentData() => 
-            Instance.LoadCurrentDataImpl();
+        public static IGameData CurrentData => 
+            Instance.LoadCurrentData();
 
         public static void SetEncryptionKey(string key)
         {
@@ -27,9 +27,9 @@ namespace DMGToolBox.SaveData
         }
 
         private readonly IDataHandler _dataHandler;
-        private GameData _currentData;
+        private IGameData _currentData;
         
-        private SaveLoadActionResult SaveGame(string saveFileName, GameData gameData)
+        private SaveLoadActionResult SaveGame(string saveFileName, IGameData gameData)
         {
             try
             {
@@ -46,11 +46,11 @@ namespace DMGToolBox.SaveData
             return SaveLoadActionResult.Success;
         }
         
-        private GameData LoadGame(string saveFileName)
+        private IGameData LoadGame(string saveFileName)
         {
             try
             {
-                GameData newData = _dataHandler.Load(saveFileName);
+                IGameData newData = _dataHandler.Load(saveFileName);
                 
                 if (newData == null)
                     return null;
@@ -70,7 +70,7 @@ namespace DMGToolBox.SaveData
             return _currentData;
         }
         
-        private GameData LoadCurrentDataImpl()
+        private IGameData LoadCurrentData()
         {
             if (_currentData == null)
                 throw new UnityException("No loaded data..");
@@ -80,8 +80,6 @@ namespace DMGToolBox.SaveData
         }
     }
     
-    
-
     public enum SaveLoadActionResult
     {
         Success,

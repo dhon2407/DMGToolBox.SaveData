@@ -35,10 +35,10 @@ namespace DMGToolBox.SaveData
         /// </summary>
         /// <param name="saveFilename">Save data filename</param>
         /// <returns></returns>
-        public GameData Load(string saveFilename)
+        public IGameData Load(string saveFilename)
         {
             string fullPath = Path.Combine(_dirPath, saveFilename);
-            GameData loadedData = null;
+            IGameData loadedData = null;
             
             if (!File.Exists(fullPath))
             {
@@ -56,7 +56,7 @@ namespace DMGToolBox.SaveData
                 if (_encryptionKey != null)
                     dataToLoad = EncryptDecrypt(dataToLoad);
 
-                loadedData = JsonUtility.FromJson<GameData>(dataToLoad);
+                loadedData = JsonUtility.FromJson<IGameData>(dataToLoad);
             }
             catch (Exception e)
             {
@@ -72,7 +72,7 @@ namespace DMGToolBox.SaveData
         /// <param name="saveFilename">Save data filename</param>
         /// <param name="gameData">Game data to save</param>
         /// <exception cref="UnityException">Errors when saving</exception>
-        public void Save(string saveFilename, GameData gameData)
+        public void Save(string saveFilename, IGameData gameData)
         {
             string fullPath = Path.Combine(_dirPath, saveFilename);
             try
