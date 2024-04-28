@@ -33,7 +33,7 @@ namespace DMGToolBox.SaveData
             {
                 _dataHandler.Save(saveFileName, gameData);
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return SaveLoadActionResult.Failed;
             }
@@ -47,7 +47,7 @@ namespace DMGToolBox.SaveData
             {
                 _loadedData = _dataHandler.Load(saveFileName);
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return null;
             }

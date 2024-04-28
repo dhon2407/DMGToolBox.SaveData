@@ -103,7 +103,7 @@ namespace DMGToolBox.SaveData
         /// </summary>
         /// <param name="data">Data to encrypt/decrypt</param>
         /// <returns>Result data</returns>
-        public string EncryptDecrypt(string data)
+        private string EncryptDecrypt(string data)
         {
             if (_encryptionKey == null)
                 return data;

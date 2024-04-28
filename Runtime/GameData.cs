@@ -1,7 +1,7 @@
 ﻿namespace DMGToolBox.SaveData
 {
     /// <summary>
-    /// Game data base class
+    /// Game data Base class
     /// </summary>
     public abstract class GameData
     {
