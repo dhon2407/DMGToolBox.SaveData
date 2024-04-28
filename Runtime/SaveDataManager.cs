@@ -9,6 +9,8 @@ namespace DMGToolBox.SaveData
             Instance.SaveGame(saveFileName, gameData);
         public static GameData Load(string saveFileName) => 
             Instance.LoadGame(saveFileName);
+        public static GameData LoadCurrentData() => 
+            Instance.LoadCurrentDataImpl();
 
         public static void SetEncryptionKey(string key)
         {
@@ -25,13 +27,16 @@ namespace DMGToolBox.SaveData
         }
 
         private readonly IDataHandler _dataHandler;
-        private GameData _loadedData;
+        private GameData _currentData;
         
         private SaveLoadActionResult SaveGame(string saveFileName, GameData gameData)
         {
             try
             {
+                gameData.Serialize();
                 _dataHandler.Save(saveFileName, gameData);
+                
+                _currentData ??= gameData;
             }
             catch (Exception)
             {
@@ -45,16 +50,37 @@ namespace DMGToolBox.SaveData
         {
             try
             {
-                _loadedData = _dataHandler.Load(saveFileName);
+                GameData newData = _dataHandler.Load(saveFileName);
+                
+                if (newData == null)
+                    return null;
+                
+                if (_currentData == null)
+                {
+                    _currentData = newData;
+                    _currentData.Deserialize();
+                }
+                
             }
             catch (Exception)
             {
                 return null;
             }
 
-            return _loadedData;
+            return _currentData;
+        }
+        
+        private GameData LoadCurrentDataImpl()
+        {
+            if (_currentData == null)
+                throw new UnityException("No loaded data..");
+            
+            _currentData.Deserialize();
+            return _currentData;
         }
     }
+    
+    
 
     public enum SaveLoadActionResult
     {
