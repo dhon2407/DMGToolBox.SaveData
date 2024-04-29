@@ -35,15 +35,15 @@ namespace DMGToolBox.SaveData
         /// </summary>
         /// <param name="saveFilename">Save data filename</param>
         /// <returns></returns>
-        public IGameData Load(string saveFilename)
+        public T Load<T>(string saveFilename) where T : IGameData
         {
             string fullPath = Path.Combine(_dirPath, saveFilename);
-            IGameData loadedData = null;
+            T loadedData = default;
             
             if (!File.Exists(fullPath))
             {
                 Debug.LogError($"Save path not existing :{fullPath}");
-                return null;
+                return default;
             }
             
             try
@@ -56,7 +56,7 @@ namespace DMGToolBox.SaveData
                 if (_encryptionKey != null)
                     dataToLoad = EncryptDecrypt(dataToLoad);
 
-                loadedData = JsonUtility.FromJson<IGameData>(dataToLoad);
+                loadedData = JsonUtility.FromJson<T>(dataToLoad);
             }
             catch (Exception e)
             {

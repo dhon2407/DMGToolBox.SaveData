@@ -7,8 +7,8 @@ namespace DMGToolBox.SaveData
     {
         public static SaveLoadActionResult Save(string saveFileName, IGameData gameData) =>
             Instance.SaveGame(saveFileName, gameData);
-        public static IGameData Load(string saveFileName) => 
-            Instance.LoadGame(saveFileName);
+        public static T Load<T>(string saveFileName) where T : IGameData => 
+            Instance.LoadGame<T>(saveFileName);
         public static IGameData CurrentData => 
             Instance.LoadCurrentData();
 
@@ -46,14 +46,15 @@ namespace DMGToolBox.SaveData
             return SaveLoadActionResult.Success;
         }
         
-        private IGameData LoadGame(string saveFileName)
+        private T LoadGame<T>(string saveFileName) where T : IGameData
         {
+            T newData = default;
             try
             {
-                IGameData newData = _dataHandler.Load(saveFileName);
+                newData = _dataHandler.Load<T>(saveFileName);
                 
                 if (newData == null)
-                    return null;
+                    return default;
                 
                 if (_currentData == null)
                 {
@@ -64,10 +65,10 @@ namespace DMGToolBox.SaveData
             }
             catch (Exception)
             {
-                return null;
+                return default;
             }
 
-            return _currentData;
+            return newData;
         }
         
         private IGameData LoadCurrentData()

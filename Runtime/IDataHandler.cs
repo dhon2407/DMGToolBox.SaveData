@@ -2,7 +2,7 @@ namespace DMGToolBox.SaveData
 {
     public interface IDataHandler
     {
-        IGameData Load(string saveFilename);
+        T Load<T>(string saveFilename) where T : IGameData;
         void Save(string saveFilename, IGameData gameData);
         string EncryptionKey { set; }
     }
