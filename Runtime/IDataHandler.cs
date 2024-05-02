@@ -5,5 +5,6 @@ namespace DMGToolBox.SaveData
         T Load<T>(string saveFilename) where T : IGameData;
         void Save(string saveFilename, IGameData gameData);
         string EncryptionKey { set; }
+        string DirPath { set; }
     }
 }

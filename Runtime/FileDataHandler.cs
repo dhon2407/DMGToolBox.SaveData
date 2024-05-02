@@ -6,7 +6,7 @@ namespace DMGToolBox.SaveData
 {
     public class FileDataHandler : IDataHandler
     {
-        private readonly string _dirPath;
+        private string _dirPath;
         private string _encryptionKey;
         
         /// <summary>
@@ -28,6 +28,14 @@ namespace DMGToolBox.SaveData
         public string EncryptionKey
         {
             set => _encryptionKey = value;
+        }
+        
+        /// <summary>
+        /// Set directory path
+        /// </summary>
+        public string DirPath
+        {
+            set => _dirPath = value;
         }
 
         /// <summary>

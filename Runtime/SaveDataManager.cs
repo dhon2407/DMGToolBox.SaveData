@@ -12,6 +12,11 @@ namespace DMGToolBox.SaveData
         public static IGameData CurrentData => 
             Instance.LoadCurrentData();
 
+        public static void SetPath(string savePath)
+        {
+            Instance._dataHandler.DirPath = savePath;
+        }
+        
         public static void SetEncryptionKey(string key)
         {
             Instance._dataHandler.EncryptionKey = key;
@@ -38,8 +43,9 @@ namespace DMGToolBox.SaveData
                 
                 _currentData ??= gameData;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Debug.LogError($"Failed saving operation :{e}");
                 return SaveLoadActionResult.Failed;
             }
 
@@ -48,7 +54,7 @@ namespace DMGToolBox.SaveData
         
         private T LoadGame<T>(string saveFileName) where T : IGameData
         {
-            T newData = default;
+            T newData;
             try
             {
                 newData = _dataHandler.Load<T>(saveFileName);
@@ -63,8 +69,9 @@ namespace DMGToolBox.SaveData
                 }
                 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Debug.LogError($"Failed loading operation :{e}");
                 return default;
             }
 
