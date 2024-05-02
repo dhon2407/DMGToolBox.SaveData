@@ -14,7 +14,8 @@ namespace DMGToolBox.SaveData
 
         public static void SetPath(string savePath)
         {
-            Instance._dataHandler.DirPath = savePath;
+            _currentDirPath = savePath;
+            Instance._dataHandler.DirPath = _currentDirPath;
         }
         
         public static void SetEncryptionKey(string key)
@@ -24,7 +25,9 @@ namespace DMGToolBox.SaveData
         
         private static SaveDataManager _instance;
         private static SaveDataManager Instance =>
-            _instance ??= new SaveDataManager(Application.persistentDataPath);
+            _instance ??= new SaveDataManager(_currentDirPath);
+
+        private static string _currentDirPath = Application.persistentDataPath;
 
         private SaveDataManager(string saveDirectory)
         {
