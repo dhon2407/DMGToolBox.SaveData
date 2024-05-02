@@ -57,19 +57,14 @@ namespace DMGToolBox.SaveData
         
         private T LoadGame<T>(string saveFileName) where T : IGameData
         {
-            T newData;
             try
             {
-                newData = _dataHandler.Load<T>(saveFileName);
-                
-                if (newData == null)
-                    return default;
+                _currentData = _dataHandler.Load<T>(saveFileName);
                 
                 if (_currentData == null)
-                {
-                    _currentData = newData;
-                    _currentData.Deserialize();
-                }
+                    return _currentData;
+                
+                _currentData.Deserialize();
                 
             }
             catch (Exception e)
@@ -78,7 +73,7 @@ namespace DMGToolBox.SaveData
                 return default;
             }
 
-            return newData;
+            return _currentData;
         }
         
         private IGameData LoadCurrentData()
