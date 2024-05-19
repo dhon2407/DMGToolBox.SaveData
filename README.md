@@ -13,47 +13,61 @@
 ### Sample
 
 ```
-    [Serializable]
-    public class TestData : IGameData
+[Serializable]
+public class TestData : IGameData
+{
+    #region Game saved data
+
+    [SerializeField] private string name;
+    [SerializeField] private uint level;
+    [SerializeField] private float exp;
+    [SerializeField] private BoolData[] boolDic;
+
+    #endregion
+
+    #region Data accessors
+
+    public string Name
     {
-        #region Game saved data
-
-        private string name;
-        private uint level;
-        private float exp;
-        private BoolData[] boolDic;
-
-        #endregion
-
-        #region Data accessors
-
-        public string Name => name;
-        public uint Level => level;
-        public float EXP => exp;
-        public Dictionary<string, bool> Bools { get; private set; } = new();
-
-        #endregion
-            
-        public void Serialize()
-        {
-            boolDic = new BoolData[Bools.Count];
-            uint index = 0;
-            foreach (KeyValuePair<string, bool> boolPair in Bools)
-                boolDic[index++] = new BoolData { key = boolPair.Key, value = boolPair.Value };
-        }
-
-        public void Deserialize()
-        {
-            Bools.Clear();
-            foreach (BoolData boolData in boolDic)
-                Bools[boolData.key] = boolData.value;
-        }
-        
-        [Serializable]
-        private struct BoolData
-        {
-            public string key;
-            public bool value;
-        }
+        get => name;
+        set => name = value;
     }
+
+    public uint Level
+    {
+        get => level;
+        set => level = value;
+    }
+    public float EXP
+    {
+        get => exp;
+        set => exp = value;
+    }
+    
+    public Dictionary<string, bool> Bools { get; private set; } = new();
+
+    #endregion
+        
+    public void Serialize()
+    {
+        boolDic = new BoolData[Bools.Count];
+        uint index = 0;
+        foreach (KeyValuePair<string, bool> boolPair in Bools)
+            boolDic[index++] = new BoolData { key = boolPair.Key, value = boolPair.Value };
+    }
+
+    public void Deserialize()
+    {
+        Bools.Clear();
+        foreach (BoolData boolData in boolDic)
+            Bools[boolData.key] = boolData.value;
+    }
+    
+    [Serializable]
+    private struct BoolData
+    {
+        public string key;
+        public bool value;
+    }
+}
 ```
