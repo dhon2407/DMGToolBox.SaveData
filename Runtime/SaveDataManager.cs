@@ -5,33 +5,94 @@ namespace DMGToolBox.SaveData
 {
     public class SaveDataManager
     {
-        public static SaveLoadActionResult Save(string saveFileName, IGameData gameData) =>
-            Instance.SaveGame(saveFileName, gameData);
-        public static T Load<T>(string saveFileName) where T : IGameData => 
-            Instance.LoadGame<T>(saveFileName);
-        public static IGameData CurrentData => 
-            Instance.LoadCurrentData();
-
-        public static void SetPath(string savePath)
+        /// <summary>
+        /// Initialize Save data manager
+        /// </summary>
+        /// <param name="savePath">Folder which save files will be created.</param>
+        /// <returns>Operation result</returns>
+        public static SaveLoadActionResult Init(string savePath = null)
         {
-            _currentDirPath = savePath;
-            Instance._dataHandler.DirPath = _currentDirPath;
+            _currentDirPath = string.IsNullOrEmpty(savePath) ? _currentDirPath : savePath;
+            if (_instance != null)
+                return SetPath(_currentDirPath);
+            
+            _instance = new SaveDataManager(_currentDirPath);
+            return SaveLoadActionResult.Success;
         }
         
-        public static void SetEncryptionKey(string key)
+        /// <summary>
+        /// Save a game data
+        /// </summary>
+        /// <param name="saveFileName">Game save filename</param>
+        /// <param name="gameData">Game data to be saved.</param>
+        /// <returns>Operation result</returns>
+        public static SaveLoadActionResult Save(string saveFileName, IGameData gameData)
         {
-            Instance._dataHandler.EncryptionKey = key;
+            return _instance?.SaveGame(saveFileName, gameData) ?? SaveLoadActionResult.NotReady;
+        }
+
+        /// <summary>
+        /// Load a game data
+        /// </summary>
+        /// <param name="saveFileName">Filename of data to be saved.</param>
+        /// <param name="gameData">Game data result</param>
+        /// <typeparam name="T">It should be a type of IGameData</typeparam>
+        /// <returns>Operation result</returns>
+        public static SaveLoadActionResult Load<T>(string saveFileName, out T gameData) where T : IGameData
+        {
+            gameData = default;
+            return _instance == null ? SaveLoadActionResult.NotReady : _instance.LoadGame(saveFileName, out gameData);
+        }
+
+        /// <summary>
+        /// Get current loaded game data
+        /// </summary>
+        /// <param name="gameData">Current game data</param>
+        /// <typeparam name="T">It should be a type of IGameData</typeparam>
+        /// <returns>Operation result</returns>
+        public static SaveLoadActionResult GetCurrentData<T>(ref T gameData) where T : IGameData
+        {
+            return _instance?.LoadCurrentData(ref gameData) ?? SaveLoadActionResult.NotReady;
+        }
+
+        /// <summary>
+        /// Update the save game data folder directory
+        /// </summary>
+        /// <param name="savePath">New directory</param>
+        /// <returns>Operation result</returns>
+        public static SaveLoadActionResult SetPath(string savePath)
+        {
+            if (_instance == null)
+                return SaveLoadActionResult.NotReady;
+            
+            _currentDirPath = savePath;
+            _instance._dataHandler.DirPath = _currentDirPath;
+
+            return SaveLoadActionResult.Success;
+        }
+        
+        /// <summary>
+        /// Set save file Encryption key for additional security
+        /// </summary>
+        /// <param name="key">Encryption key</param>
+        /// <returns>Operation result</returns>
+        public static SaveLoadActionResult SetEncryptionKey(string key)
+        {
+            if (_instance == null)
+                return SaveLoadActionResult.NotReady;
+            
+            _instance._dataHandler.EncryptionKey = key;
+
+            return SaveLoadActionResult.Success;
         }
         
         private static SaveDataManager _instance;
-        private static SaveDataManager Instance =>
-            _instance ??= new SaveDataManager(_currentDirPath);
-
         private static string _currentDirPath = Application.persistentDataPath;
 
         private SaveDataManager(string saveDirectory)
         {
-            _dataHandler = new FileDataHandler(saveDirectory);
+            _currentDirPath = saveDirectory;
+            _dataHandler = new FileDataHandler(_currentDirPath);
         }
 
         private readonly IDataHandler _dataHandler;
@@ -43,7 +104,6 @@ namespace DMGToolBox.SaveData
             {
                 gameData.Serialize();
                 _dataHandler.Save(saveFileName, gameData);
-                
                 _currentData ??= gameData;
             }
             catch (Exception e)
@@ -55,41 +115,42 @@ namespace DMGToolBox.SaveData
             return SaveLoadActionResult.Success;
         }
         
-        private T LoadGame<T>(string saveFileName) where T : IGameData
+        private SaveLoadActionResult LoadGame<T>(string saveFileName, out T gameData) where T : IGameData
         {
-            T newData;
+            gameData = default;
             try
             {
-                newData = _dataHandler.Load<T>(saveFileName);
+                gameData = _dataHandler.Load<T>(saveFileName);
+
+                if (gameData == null)
+                    return SaveLoadActionResult.Failed;
                 
-                if (newData == null)
-                    return default;
-                
-                _currentData = newData;
+                _currentData = gameData;
             }
             catch (Exception e)
             {
                 Debug.LogError($"Failed loading operation :{e}");
-                return default;
+                return SaveLoadActionResult.Failed;
             }
 
-            newData.Deserialize();
-            return newData;
+            gameData.Deserialize();
+            return SaveLoadActionResult.Success;
         }
         
-        private IGameData LoadCurrentData()
+        private SaveLoadActionResult LoadCurrentData<T>(ref T gameData) where T : IGameData
         {
             if (_currentData == null)
-                throw new UnityException("No loaded data..");
+                return SaveLoadActionResult.NotReady;
             
             _currentData.Deserialize();
-            return _currentData;
+            return SaveLoadActionResult.Success;
         }
     }
     
     public enum SaveLoadActionResult
     {
         Success,
-        Failed
+        Failed,
+        NotReady,
     }
 }
