@@ -1,6 +1,6 @@
 ## How to use
 
-- Your game data class inherit from the interface IGameData, and must have and attribute of [Serializable].
+- Your game data class should inherit from the interface IGameData, and must have and attribute of [Serializable].
 - Since this system uses JsonUtility to serialize data, it is limited to atomic datatypes, plain class or struct with the [Serializable] attribute. (*see sample below*)
 - In order to support types such as Dictionary, create a simple structure and use <mark>Serialize()</mark> and <mark>Deserialize()</mark> method to setup the data.
 - You need to initialize the system by calling <mark>SaveDataManager.Init()</mark>
